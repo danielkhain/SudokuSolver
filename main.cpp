@@ -21,9 +21,18 @@ int main(int argc, const char * argv[]) {
     SudokuSolver solver;
     solver.initializeGrid();
     cout << "\nWelcome to SudokuSolver!\n";
-    cout << "Reading input from " << argv[1] << endl;
+    if (argc != 2){
+        cout << "Bad input.\n";
+        cout << "Please write './sudoku [input_file]'\n";
+        exit(1);
+    }
     fstream fin;
     fin.open(argv[1]);
+    if (!fin){
+        cout << "Unable to open file.\n";
+        exit(1);
+    }
+    cout << "Reading input from " << argv[1] << endl;
     solver.fillGrid(fin);
     solver.prepSolver();
     solver.runSolver();
