@@ -1,5 +1,5 @@
 # SudokuSolver
-Clever Sudoku Puzzle Solver Backtracking Algorithm
+Clever Sudoku Puzzle Solver - Improved Backtracking Algorithm
 
 ### About The Project
 This project solves Sudoku puzzles. Unlike most Sudoku solving algorithms which use a naive Backtracking algorithm, this approach utilizes the same strategy that a human would. The solver first fills squares that can accept only one options. Then the solver uses Backracking, starting with the squares that can accept the fewest options.
