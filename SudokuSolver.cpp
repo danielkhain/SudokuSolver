@@ -18,11 +18,13 @@
 
 using namespace std;
 
+// A Square has a value [0-9] and vector of potential values.
 struct Square{
     vector<int> potentialValues;
     int value;
 };
 
+// A Grid is a 9x9 array of Squares.
 struct Grid{
     vector< vector<Square> > grid;
 };
@@ -30,19 +32,19 @@ struct Grid{
 class SudokuSolver{
     private:
     stack<Grid> status;
+    vector< stack< pair<int, int> > > numUnknown;
+    stack<pair<pair<int, int>, int>> hypothesis;
     Grid grid;
     Grid tempGrid;
-    vector< stack< pair<int, int> > > numUnknown;
+    clock_t start, end;
     int unfilled = 0;
-    stack<pair<pair<int, int>, int>> hypothesis;
     int numGuesses =0;
     int numIterations = 0;
     int numFilled = 0;
-    clock_t start, end;
-
 
     public:
 
+    // Initializes all the vectors.
     void initializeGrid(){
         start = clock();
         grid.grid.resize(9);
@@ -61,6 +63,7 @@ class SudokuSolver{
         numUnknown.resize(10);
     }
 
+    // Fills the Grid with user input.
     void fillGrid(fstream& fin){
         string line;
         int row = 0;
@@ -79,12 +82,14 @@ class SudokuSolver{
         cout << "\n\n";
     }
 
+    // Modify relevant potential values.
     void nullifyOptions(int row, int col){
         updateByRows(row);
         updateByCols(col);
         updateByBoxes(((row / 3) * 3) + (col / 3));
     }
 
+    // Updates potential values of a row.
     void updateByRows(int row){
         // Go through all the columns.
         for (int col = 0; col < 9; col++){
@@ -97,6 +102,8 @@ class SudokuSolver{
             }
         }
     }
+
+    // Updates potential values of a column.
     void updateByCols(int col){
         // Go through all the rows.
         for (int row = 0; row < 9; row++){
@@ -110,6 +117,7 @@ class SudokuSolver{
         }
     }
 
+    // Updates potential values of a box.
     void updateByBoxes(int box){
         // Go through all the squares in box.
         for (int row = ((box / 3) * 3); row < ((box / 3) * 3 + 3); row++){
@@ -126,6 +134,7 @@ class SudokuSolver{
         }
     }
 
+    // Update potential values of the grid.
     void updatePotential(){
         for (int i = 0; i < 9; i++){
             updateByRows(i);
@@ -151,6 +160,7 @@ class SudokuSolver{
         }
     }
 
+    // Print the grid.
     void printGrid(){
         for (int row = 0; row < 9; row++){
             if (row % 3 == 0){
@@ -167,26 +177,22 @@ class SudokuSolver{
         cout << "______________________\n";
     }
 
+    // Check if current situation is possible.
     bool isPossible(){
       return (numUnknown[0].empty());
     }
 
+    // Prep for runSolver.
     void prepSolver(){
       status.push(grid);
     }
 
-    void printStats(){
-        end = clock();
-        cout << "\nSome statistics:\n";
-        cout << "Originally, " << numFilled << "/81 squares were filled.\n";
-        cout << "The solver made " << numGuesses << " guesses.\n";
-        cout << "The solver went through " << numIterations << " iterations.\n";
-        cout << "The time taken was " << double(end-start) / 1000000 << " seconds.\n\n";
-    }
-
+    // Solve the puzzle.
     void runSolver(){
         numIterations++;
         updatePotential();
+
+        // Check if sitaution is possible.
         if (!isPossible()){
             status.pop();
             if (status.empty()){
@@ -211,19 +217,23 @@ class SudokuSolver{
             status.top().grid[a][b].potentialValues[val-1] = -1;
             runSolver();
         }
+        // Check if solved the puzzle.
         else if (unfilled == 0){
             cout << "Here is the solution:\n";
             printGrid();
             printStats();
             exit(0);
         }
+        // Fill in a square.
         else{
             for (int idk = 1; idk < numUnknown.size(); idk++){
+                // Look at square with fewest potential values.
                 if (!numUnknown[idk].empty()){
                     int a,b = 0;
                     a = numUnknown[idk].top().first;
                     b = numUnknown[idk].top().second;
                     numUnknown[idk].pop();
+                    // If num potential values = 1.
                     if (idk == 1){
                         for (int j = 0; j < 9; j++){
                             if (grid.grid[a][b].potentialValues[j] != -1){
@@ -236,6 +246,7 @@ class SudokuSolver{
                             }
                         }
                     }
+                    // If num potential values > 1.
                     else{
                         for (int j = 0; j < 9; j++){
                             if (grid.grid[a][b].potentialValues[j] != -1){
@@ -251,5 +262,15 @@ class SudokuSolver{
                 }
             }
           }
+    }
+
+    // Print solution statistics.
+    void printStats(){
+        end = clock();
+        cout << "\nSome statistics:\n";
+        cout << "Originally, " << numFilled << "/81 squares were filled.\n";
+        cout << "The solver made " << numGuesses << " guesses.\n";
+        cout << "The solver went through " << numIterations << " iterations.\n";
+        cout << "The time taken was " << double(end-start) / 1000000 << " seconds.\n\n";
     }
 };

@@ -7,20 +7,20 @@
 //
 
 #include <iostream>
-#include <vector>
-#include <stack>
 #include <fstream>
-#include <queue>
-#include <string>
 #include "SudokuSolver.cpp"
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
     std::ios_base::sync_with_stdio(false);
+    cout << "\nWelcome to SudokuSolver!\n";
+
+    // Create solver instance.
     SudokuSolver solver;
     solver.initializeGrid();
-    cout << "\nWelcome to SudokuSolver!\n";
+
+    // Confirm that input is good.
     if (argc != 2){
         cout << "Bad input.\n";
         cout << "Please write './sudoku [input_file]'\n";
@@ -33,6 +33,8 @@ int main(int argc, const char * argv[]) {
         exit(1);
     }
     cout << "Reading input from " << argv[1] << endl;
+
+    // Prep and run the solver.
     solver.fillGrid(fin);
     solver.prepSolver();
     solver.runSolver();
